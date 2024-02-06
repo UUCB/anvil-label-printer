@@ -1,4 +1,4 @@
-from jinja2 import Environment, PackageLoader, select_autoescape
+from jinja2 import Environment, PackageLoader, select_autoescape, FileSystemLoader
 import pdfkit
 import string
 import random
@@ -17,12 +17,12 @@ def __init__():
 
 
 env = Environment(
-    loader=PackageLoader("j2labeler"),
+    loader=FileSystemLoader("./"),
     autoescape=select_autoescape(),
 )
 
 options = {
-    'page-width': 2 * 25.4,
+    'page-width': 1 * 25.4,
     'page-height': 1 * 25.4,
     'margin-top': '0in',
     'margin-bottom': '0in',
@@ -40,7 +40,7 @@ def print_label(label_vars: dict, template: str, wkhtml_options: dict={},):
         job_id, # Random filename to avoid Weird Crap (tm)
         options=wkhtml_options, # Pass in options from the Anvil app
     )
-    os.system(f'lpr -P {printer_name} {job_id}')
+    os.system(f'lp -d {printer_name} -ofit-to-page {job_id}')
     if not debug:
         os.remove(job_id)
         print(f'printed label {job_id}')
