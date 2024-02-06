@@ -3,6 +3,7 @@ import pdfkit
 import string
 import random
 import os
+import barcode
 
 import anvil.server
 
@@ -31,10 +32,17 @@ options = {
 }
 
 
+def generate_barcode(data: str) -> str:
+    code = barcode.Code128(data)
+    return code.render(writer_options={'text_distance': 4}).decode('utf-8')
+
+
 @anvil.server.callable
 def print_label(label_vars: dict, template: str, wkhtml_options: dict={},):
     job_id = 'label_temp/' + ''.join(random.choices(string.ascii_letters, k=10))
     template = env.get_template(template)
+    if 'barcode' in label_vars.keys():
+        label_vars[f'{label_vars["barcode"]}_barcode'] = generate_barcode(label_vars[label_vars['barcode']])
     pdfkit.from_string(
         template.render(label_vars=label_vars), # Returns a string of HTML
         job_id, # Random filename to avoid Weird Crap (tm)
