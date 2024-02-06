@@ -34,7 +34,12 @@ options = {
 
 def generate_barcode(data: str) -> str:
     code = barcode.Code128(data)
-    return code.render(writer_options={'text_distance': 4}).decode('utf-8')
+    return code.render(
+        writer_options={
+            'text_distance': 4,
+            'module_width': 0.6,
+        }
+    ).decode('utf-8')
 
 
 @anvil.server.callable
